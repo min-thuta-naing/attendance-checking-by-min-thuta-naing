@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
-    "auth_app"
+    "attandence_check"
 ]
 
 MIDDLEWARE = [
@@ -77,12 +77,25 @@ WSGI_APPLICATION = "mybackend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# postgresql set up 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'attendancedb',      # your DB name
+        'USER': 'minthutanaing', # your DB user
+        'PASSWORD': '6531503157',  # your DB password
+        'HOST': 'localhost',          # for development or Render DB host later
+        'PORT': '5432',
     }
 }
+
+# i will not use sqlite3 in this project
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 # Password validation
