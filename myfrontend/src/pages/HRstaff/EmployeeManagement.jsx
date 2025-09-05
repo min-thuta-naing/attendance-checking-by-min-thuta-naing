@@ -110,6 +110,11 @@ function EmployeeManagement() {
             <div className="flex-1 pt-20 p-6">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
                     <h1 className="text-2xl font-bold mb-4 text-center">Employee Management</h1>
+                    <p className="text-base mb-4 text-start">
+                        The following is the list of all registered employees.<br />
+                        Please click <strong>edit</strong> to update the name or job title.
+                    </p>
+
 
                     <table className="w-full table-auto border border-gray-300">
                         <thead>
