@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import { UserIcon, ArrowRightOnRectangleIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/Loading";
 
 function Profile() {
     const [currentUser, setCurrentUser] = useState(null);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     // Load user from localStorage on component mount
     useEffect(() => {
@@ -20,13 +21,9 @@ function Profile() {
 
     if (!currentUser) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Loading...</p>
-            </div>
+            <Loading redirectButtonNav="/login" />
         );
     }
-
-
 
     return (
         <div className="min-h-screen pt-20 bg-gray-100 flex flex-col items-center justify-center p-6">

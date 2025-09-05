@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { UserIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import Loading from "../../components/Loading";
 
 function Home() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -20,9 +21,7 @@ function Home() {
 
     if (!currentUser) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Loading...</p>
-            </div>
+            <Loading redirectButtonNav="/login" />
         );
     }
 

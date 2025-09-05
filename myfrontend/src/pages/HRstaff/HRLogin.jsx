@@ -1,17 +1,39 @@
 import { useState } from "react";
+import axios from "axios";
 import PasswordInputComponent from "../../components/PasswordInputComponent";
 import EmailInputComponent from "../../components/EmailInputComponent";
-
+import { useNavigate } from "react-router-dom";
 
 function HRLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); // new state
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate(); 
 
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Email:", email, "Password:", password);
+        setError("");
+
+        try {
+            const response = await axios.post("http://localhost:8000/api/login/hr/", {
+                email,
+                password,
+            });
+
+            // Save the logged-in user in localStorage
+            localStorage.setItem("currentUser", JSON.stringify(response.data));
+
+            console.log("Login successful:", response.data);
+            console.log("Logged in user:", response.data);
+
+            // window.location.href = "/hr-dashboard";
+            navigate("/hr-dashboard");
+
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.error || "Login failed");
+        }
     };
 
     return (
@@ -21,8 +43,15 @@ function HRLogin() {
                     HR Login
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    <EmailInputComponent/>
-                    <PasswordInputComponent/>
+                    <EmailInputComponent value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <PasswordInputComponent
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        showPassword={showPassword}
+                        toggleShowPassword={() => setShowPassword(!showPassword)}
+                    />
+
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
 
                     <button
                         type="submit"
@@ -31,16 +60,9 @@ function HRLogin() {
                         Sign In
                     </button>
                 </form>
-
-                <p className="text-center text-sm text-gray-600 mt-4">
-                    Don’t have an account?{" "}
-                    <a href="/signup" className="text-blue-600 hover:underline">
-                        Sign up
-                    </a>
-                </p>
             </div>
         </div>
     );
 }
 
-export default HRLogin; 
+export default HRLogin;
