@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { EyeIcon,EyeSlashIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
-function PasswordInputComponent() {
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); 
+function PasswordInputComponent({ value, onChange }) {
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <div className="relative">
@@ -13,8 +12,8 @@ function PasswordInputComponent() {
             <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={value}        // use parent value
+                onChange={onChange}  // use parent handler
                 className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:ring-2 focus:ring-[#A2AADB] focus:outline-none pr-10"
                 required
             />
@@ -33,4 +32,4 @@ function PasswordInputComponent() {
     )
 }
 
-export default PasswordInputComponent; 
+export default PasswordInputComponent;

@@ -91,6 +91,10 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'attendance_check.User'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # i will not use sqlite3 in this project  
 # DATABASES = {
 #     "default": {
