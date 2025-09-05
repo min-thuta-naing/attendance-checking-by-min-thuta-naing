@@ -14,6 +14,7 @@ function Sidebar({ currentUser }) {
 
     const menuItems = [
         { name: "Dashboard", icon: <HomeIcon className="h-5 w-5 text-black" />, path: "/hr-dashboard" },
+        { name: "HR Admins", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-staff-all-list" },
         { name: "Employees", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-emp-mgmt" },
         { name: "Register New Employee", icon: <UserPlusIcon className="h-5 w-5 text-black" />, path: "/hr-register-emp" },
         { name: "Profile", icon: <UserIcon className="h-5 w-5 text-black" />, path: "/hr-profile" },
@@ -39,7 +40,7 @@ function Sidebar({ currentUser }) {
             >
                 {/* Close button only on mobile */}
                 <div className="sm:hidden flex justify-end mb-6">
-                    <button 
+                    <button
                         onClick={() => setIsSidebarOpen(false)}
                         className="absolute top-4 right-4 circle-btn flex justify-center items-center bg-[#DBDFEA] shadow-md"
                     >

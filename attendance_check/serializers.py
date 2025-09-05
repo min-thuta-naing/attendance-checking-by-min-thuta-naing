@@ -20,7 +20,14 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email and password are required")
         return data
 
-class EmployeeSerializer(serializers.ModelSerializer):
+class EmployeeListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # HR can only see these fields and optionally edit these
+        fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
+        read_only_fields = ('id', 'email', 'role')
+
+class HRStaffListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # HR can only see these fields and optionally edit these

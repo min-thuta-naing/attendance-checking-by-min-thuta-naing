@@ -56,7 +56,7 @@ function HRLogin() {
                         type="submit"
                         className="w-full font-medium btn-primary"
                     >
-                        Sign In
+                        Log In
                     </button>
                 </form>
             </div>
