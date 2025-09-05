@@ -5,7 +5,8 @@ import FirstNameInputComponent from "../../components/FirstNameInputComponent";
 import LastNameInputComponent from "../../components/LastNameInputComponent";
 import JobTitleInputComponent from "../../components/JobTitleInputComponent";
 import EmailInputComponent from "../../components/EmailInputComponent";
-import PasswordInputComponent from "../../components/PasswordInputComponent";
+import RoleSelectComponent from "../../components/RoleSelectComponent";
+import ToastNotification from "../../components/ToastNotification";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +20,7 @@ function RegisterEmployee() {
         role: "EMPLOYEE", 
     });
     const [message, setMessage] = useState("");
+    const [popupMessage, setPopupMessage] = useState("");
     const navigate = useNavigate();
 
     // Load current HR user
@@ -27,10 +29,6 @@ function RegisterEmployee() {
         if (!user) return;
         setCurrentUser(user);
     }, []);
-
-    // if (!currentUser) {
-    //     return <Loading redirectButtonNav="/hrlogin" />;
-    // }
 
     // to refresh a new access token when it is expired 
     const refreshAccessToken = async () => {
@@ -78,7 +76,7 @@ function RegisterEmployee() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            alert("Employee registered successfully!");
+            setPopupMessage({ message: "Employee registered successfully!", type: "success" });
             setFormData({
                 first_name: "",
                 last_name: "",
@@ -99,7 +97,7 @@ function RegisterEmployee() {
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
                     console.log("Token:", currentUser.access);
-                    alert("Employee registered successfully!");
+                    setPopupMessage({ message: "Employee registered successfully!", type: "success" });
                     setFormData({
                         first_name: "",
                         last_name: "",
@@ -109,11 +107,11 @@ function RegisterEmployee() {
                     });
                 } catch (innerErr) {
                     console.error(innerErr);
-                    alert(innerErr.response?.data?.error || "Registration failed");
+                    setPopupMessage({ message: "Failed to register employee. Try again!", type: "error" });
                 }
             } else {
                 console.error(err);
-                alert(err.response?.data?.error || "Registration failed");
+                setPopupMessage({ message: "Failed to register employee. Try again!", type: "error" });
             }
         }
     };
@@ -127,7 +125,7 @@ function RegisterEmployee() {
     return (
         <div className="min-h-screen bg-gray-100 flex">
             <Sidebar currentUser={currentUser} />
-            <div className="flex-1 pt-16 p-6">
+            <div className="flex-1 pt-16 p-6 relative">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto text-center">
                     <h2 className="text-xl font-bold mb-6">Register New Employee</h2>
 
@@ -154,31 +152,16 @@ function RegisterEmployee() {
                             onChange={handleChange}
                             name="email"
                         />
-                        {/* <PasswordInputComponent
-                            value={formData.password}
+
+                        <RoleSelectComponent
+                            value={formData.role}
                             onChange={handleChange}
-                            name="password"
+                            name="role"
                         />
-                        <PasswordInputComponent
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            name="confirmPassword"
-                        /> */}
 
                         <div className="text-sm text-gray-700 mb-4">
                             The default password is <strong>Default@123</strong>. Please inform the employee to change it later.
                         </div>
-
-                        <label className="block mb-2 font-medium">Role</label>
-                        <select
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:ring-2 focus:ring-[#A2AADB] focus:outline-none"
-                        >
-                            <option value="EMPLOYEE">Employee</option>
-                            <option value="HR">HR staff</option>
-                        </select>
 
 
                         <button
@@ -189,6 +172,15 @@ function RegisterEmployee() {
                         </button>
                     </form>
                 </div>
+
+                {popupMessage && (
+                    <ToastNotification
+                        message={popupMessage.message}
+                        type={popupMessage.type}
+                        onClose={() => setPopupMessage("")}
+                    />
+                )}
+
             </div>
         </div>
     );
