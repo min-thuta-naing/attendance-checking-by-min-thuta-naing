@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User
-from .serializers import LoginSerializer, EmployeeSerializer, EmployeeRegisterSerializer
+from .serializers import LoginSerializer, HRStaffListSerializer,EmployeeListSerializer, EmployeeRegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
@@ -53,8 +53,7 @@ class HRLoginView(APIView):
                 "access": str(refresh.access_token),   # <- access token
                 "refresh": str(refresh),               # <- refresh token
             })
-        return Response(serializer.errors, status=400)
-
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Other employee login
@@ -65,6 +64,9 @@ class EmployeeLoginView(APIView):
             user = serializer.validated_data["user"]
             if user.role != "EMPLOYEE":
                 return Response({"error": "Please use HR login!"}, status=status.HTTP_403_FORBIDDEN)
+            
+            # Create JWT token
+            refresh = RefreshToken.for_user(user)
             return Response({
                 "message": "Employee login successful",
                 "id": user.id,
@@ -73,9 +75,26 @@ class EmployeeLoginView(APIView):
                 "last_name": user.last_name,
                 "job_title": user.job_title,
                 "role": user.role,
+                "access": str(refresh.access_token),   # <- access token
+                "refresh": str(refresh),               # <- refresh token
             })
-        print(serializer.errors)
+        # print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# view for which HR can see all the other HR staff  
+class HRStaffListView(APIView):
+    # JWT
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+
+    def get(self, request):
+        if request.user.role != "HR":
+            return Response({"error": "Forbidden"}, status=403)
+
+        hrstaff = User.objects.filter(role="HR")
+        serializer = HRStaffListSerializer(hrstaff, many=True)
+        return Response(serializer.data)
 
 
 # view for which HR can see all employees 
@@ -89,8 +108,39 @@ class EmployeeListView(APIView):
             return Response({"error": "Forbidden"}, status=403)
 
         employees = User.objects.filter(role="EMPLOYEE")
-        serializer = EmployeeSerializer(employees, many=True)
+        serializer = EmployeeListSerializer(employees, many=True)
         return Response(serializer.data)
+    
+
+# view for which HR can update some field of all HR admin staff 
+class HRStaffListUpdateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Only HR should access this endpoint
+        if request.user.role != "HR":
+            return Response({"error": "Forbidden"}, status=403)
+
+        hrstaff = User.objects.filter(role="HR")
+        serializer = EmployeeListSerializer(hrstaff, many=True)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        # Only HR can update first_name, last_name, job_title
+        if request.user.role != "HR":
+            return Response({"error": "Forbidden"}, status=403)
+
+        try:
+            hrstaff = User.objects.get(pk=pk, role="HR")
+        except User.DoesNotExist:
+            return Response({"error": "Employee not found"}, status=404)
+
+        serializer = HRStaffListSerializer(hrstaff, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
     
     
 # view for which HR can update some field of all employees 
@@ -104,7 +154,7 @@ class EmployeeListUpdateView(APIView):
             return Response({"error": "Forbidden"}, status=403)
 
         employees = User.objects.filter(role="EMPLOYEE")
-        serializer = EmployeeSerializer(employees, many=True)
+        serializer = EmployeeListSerializer(employees, many=True)
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -117,7 +167,7 @@ class EmployeeListUpdateView(APIView):
         except User.DoesNotExist:
             return Response({"error": "Employee not found"}, status=404)
 
-        serializer = EmployeeSerializer(employee, data=request.data, partial=True)
+        serializer = EmployeeListSerializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

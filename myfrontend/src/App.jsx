@@ -7,6 +7,7 @@ import HRDashboard from './pages/HRstaff/HRDashboard';
 import EmployeeManagement from "./pages/HRstaff/EmployeeManagement";
 import HRProfile from "./pages/HRstaff/HRProfile";
 import RegisterEmployee from './pages/HRstaff/RegisterEmployee';
+import HRAdminManagement from './pages/HRstaff/HRAdminManagement';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/hr-dashboard" element={<HRDashboard />} />
         <Route path="/hr-emp-mgmt" element={<EmployeeManagement />} />
+        <Route path="/hr-staff-all-list" element={<HRAdminManagement />} />
         <Route path="/hr-profile" element={<HRProfile />} />
         <Route path="/hr-register-emp" element={<RegisterEmployee/>}/> 
       </Routes>
