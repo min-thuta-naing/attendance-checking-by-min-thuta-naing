@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Employee/Login';
 import Home from './pages/Employee/Home';
 import HRLogin from './pages/HRstaff/HRLogin';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/hrlogin" element={<HRLogin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile/>}/>
       </Routes>
     </Router>
   );
