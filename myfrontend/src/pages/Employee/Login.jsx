@@ -49,12 +49,14 @@ import { useState } from "react";
 import axios from "axios";
 import PasswordInputComponent from "../../components/PasswordInputComponent";
 import EmailInputComponent from "../../components/EmailInputComponent";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const navigate = useNavigate(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,7 +75,8 @@ function Login() {
             console.log("Logged in user:", response.data);
 
             // Redirect to dashboard
-            window.location.href = "/home";
+            // window.location.href = "/home";
+            navigate("/home"); 
 
         } catch (err) {
             console.error(err);

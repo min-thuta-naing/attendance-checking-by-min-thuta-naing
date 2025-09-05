@@ -14,8 +14,16 @@ class HRLoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data["user"]
             if user.role != "HR":
-                return Response({"error": "Not authorized as HR"}, status=status.HTTP_403_FORBIDDEN)
-            return Response({"message": "HR login successful", "email": user.email, "role": user.role})
+                return Response({"error": "Please use employee login!"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({
+                "message": "HR login successful",
+                "id": user.id,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "job_title": user.job_title,
+                "role": user.role,
+            })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -25,7 +33,7 @@ class EmployeeLoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data["user"]
             if user.role != "EMPLOYEE":
-                return Response({"error": "Not authorized as Employee"}, status=status.HTTP_403_FORBIDDEN)
+                return Response({"error": "Please use HR login!"}, status=status.HTTP_403_FORBIDDEN)
             return Response({
                 "message": "Employee login successful",
                 "id": user.id,
