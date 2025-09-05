@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../components/Header";
+import Header from "../components/Header";
+import { UserIcon, ArrowRightOnRectangleIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-import { UserIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
-function Home() {
+function Profile() {
     const [currentUser, setCurrentUser] = useState(null);
     const navigate = useNavigate(); 
 
@@ -15,7 +15,7 @@ function Home() {
 
     const handleLogout = () => {
         localStorage.removeItem("currentUser");
-        navigate("/login");
+        window.location.href = "/login"; // redirect to login page
     };
 
     if (!currentUser) {
@@ -26,17 +26,20 @@ function Home() {
         );
     }
 
+
+
     return (
         <div className="min-h-screen pt-20 bg-gray-100 flex flex-col items-center justify-center p-6">
             <Header
-                title="Z Company"
+                backNavigation
+                title="Profile"
                 menuItems={[
-                    { label: "Profile", icon: <UserIcon className="h-6 w-6" />, onClick: () => navigate("/profile") },
-                    { label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => handleLogout() },
+                    { label: "Go to Home", icon: <HomeIcon className="h-6 w-6" />, onClick: () => navigate("/home") },
+                    { label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => alert("Logging out") },
                 ]}
             />
             <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
-                <h1 className="text-2xl font-bold mb-4">Welcome Home!</h1>
+                <h1 className="text-2xl font-bold mb-4">Profile!</h1>
                 <p className="text-gray-700 mb-2">
                     <strong>Email:</strong> {currentUser.email}
                 </p>
@@ -60,4 +63,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default Profile;
