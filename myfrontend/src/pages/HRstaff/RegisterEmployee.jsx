@@ -16,7 +16,7 @@ function RegisterEmployee() {
         last_name: "",
         job_title: "",
         email: "",
-        role: "EMPLOYEE", // default
+        role: "EMPLOYEE", 
     });
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
@@ -28,29 +28,34 @@ function RegisterEmployee() {
         setCurrentUser(user);
     }, []);
 
-    if (!currentUser) {
-        return <Loading redirectButtonNav="/hrlogin" />;
-    }
+    // if (!currentUser) {
+    //     return <Loading redirectButtonNav="/hrlogin" />;
+    // }
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    // Refresh access token if expired
+    // to refresh a new access token when it is expired 
     const refreshAccessToken = async () => {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!currentUser.refresh) return null; 
+
         try {
-            const user = JSON.parse(localStorage.getItem("currentUser"));
+            // const user = JSON.parse(localStorage.getItem("currentUser"));
             const res = await axios.post("http://localhost:8000/api/token/refresh/", {
-                refresh: user.refresh,
+                refresh: currentUser.refresh,
             });
-            const updatedUser = { ...user, access: res.data.access };
+            const updatedUser = { ...currentUser, access: res.data.access };
             localStorage.setItem("currentUser", JSON.stringify(updatedUser));
             setCurrentUser(updatedUser);
             return res.data.access;
         } catch (err) {
-            console.error("Refresh token failed:", err);
-            navigate("/hrlogin"); // redirect HR to login
+            console.error("Failed to refresh token:", err);
+            localStorage.removeItem("currentUser");
+            navigate("/hrlogin");
+            return null; 
         }
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
@@ -64,7 +69,6 @@ function RegisterEmployee() {
             role: formData.role,
         };
 
-
         let token = currentUser.access;
 
         try {
@@ -76,17 +80,11 @@ function RegisterEmployee() {
 
             alert("Employee registered successfully!");
             setFormData({
-                // first_name: "",
-                // last_name: "",
-                // job_title: "",
-                // email: "",
-                // password: "",
-                // confirmPassword: "",
                 first_name: "",
                 last_name: "",
                 job_title: "",
                 email: "",
-                role: "EMPLOYEE", // default
+                role: "EMPLOYEE", 
             });
 
         } catch (err) {
@@ -103,17 +101,11 @@ function RegisterEmployee() {
                     console.log("Token:", currentUser.access);
                     alert("Employee registered successfully!");
                     setFormData({
-                        // first_name: "",
-                        // last_name: "",
-                        // job_title: "",
-                        // email: "",
-                        // password: "",
-                        // confirmPassword: "",
                         first_name: "",
                         last_name: "",
                         job_title: "",
                         email: "",
-                        role: "EMPLOYEE", // default
+                        role: "EMPLOYEE", 
                     });
                 } catch (innerErr) {
                     console.error(innerErr);
@@ -126,7 +118,11 @@ function RegisterEmployee() {
         }
     };
 
-
+    if (!currentUser) {
+        return (
+            <Loading redirectButtonNav="/hrlogin" />
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex">

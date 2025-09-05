@@ -56,9 +56,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class EmployeeRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'job_title', 'role']  # remove is_staff, is_superuser
+        fields = ['first_name', 'last_name', 'email', 'job_title', 'role']  
         extra_kwargs = {
-            'role': {'required': True},  # HR must select role
+            'role': {'required': True}, 
         }
 
     def create(self, validated_data):
