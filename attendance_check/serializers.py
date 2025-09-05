@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User
+from django.contrib.auth.hashers import make_password
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -18,30 +19,70 @@ class LoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Email and password are required")
         return data
-    
-# from rest_framework import serializers
-# from django.contrib.auth.hashers import check_password
-# from .models import User
 
-# class LoginSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-#     password = serializers.CharField(write_only=True)
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # HR can only see these fields and optionally edit these
+        fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
+        read_only_fields = ('id', 'email', 'role')
 
-#     def validate(self, data):
-#         email = data.get("email")
-#         password = data.get("password")
+# class EmployeeRegisterSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['first_name', 'last_name', 'email', 'job_title', 'password', 'role', 'is_staff', 'is_superuser']
+#         extra_kwargs = {
+#             'password': {'write_only': True},
+#             'role': {'read_only': True}, 
+#             # 'role': {'required': True},
+#             'is_staff': {'read_only': True},
+#             'is_superuser': {'read_only': True},
+#         }
 
-#         if not email or not password:
-#             raise serializers.ValidationError("Email and password are required")
+#     def create(self, validated_data):
+#         password = validated_data.pop('password', None)
+#         user = super().create(validated_data)
+#         if password:
+#             user.set_password(password)  # hashes the password
+#         else:
+#             user.set_password("Default@123")  # default password
+#         user.role = "EMPLOYEE"    # system-controlled
+#         user.is_superuser = False # system-controlled
+#         user.is_staff = True      # must be staff
+#         user.save()
+#         return user
 
-#         try:
-#             user = User.objects.get(email=email)
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError("Invalid email or password")
 
-#         if not check_password(password, user.password):
-#             raise serializers.ValidationError("Invalid email or password")
+class EmployeeRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'job_title', 'role']  # remove is_staff, is_superuser
+        extra_kwargs = {
+            'role': {'required': True},  # HR must select role
+        }
 
-#         data["user"] = user
-#         return data
+    def create(self, validated_data):
+        # System-controlled fields
+        role = validated_data.get("role", "EMPLOYEE")
+        if role not in ["EMPLOYEE", "HR"]:
+            role = "EMPLOYEE"
+
+        user = User(
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
+            email=validated_data["email"],
+            job_title=validated_data.get("job_title", ""),
+            role=role,
+            is_staff=True,
+            is_superuser=False
+        )
+
+        # Default password
+        user.set_password("Default@123")
+        user.save()
+        return user
+
+
+
+
 

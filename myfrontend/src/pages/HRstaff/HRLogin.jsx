@@ -21,13 +21,12 @@ function HRLogin() {
                 password,
             });
 
-            // Save the logged-in user in localStorage
-            localStorage.setItem("currentUser", JSON.stringify(response.data));
+            // here save the user info of logged in user and JWT tokens 
+            localStorage.setItem("currentUser", JSON.stringify({
+                ...response.data,  // includes email, role, access, etc.
+            }));
 
             console.log("Login successful:", response.data);
-            console.log("Logged in user:", response.data);
-
-            // window.location.href = "/hr-dashboard";
             navigate("/hr-dashboard");
 
         } catch (err) {
