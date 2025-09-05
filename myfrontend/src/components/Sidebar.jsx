@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { UserIcon, ArrowRightOnRectangleIcon, HomeIcon, UsersIcon, Bars4Icon, XMarkIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
+import { UserIcon, ArrowRightOnRectangleIcon, HomeIcon, UsersIcon, Bars4Icon, XMarkIcon, BuildingOffice2Icon, UserPlusIcon } from "@heroicons/react/24/outline";
 
 function Sidebar({ currentUser }) {
     const navigate = useNavigate();
@@ -15,6 +15,7 @@ function Sidebar({ currentUser }) {
     const menuItems = [
         { name: "Dashboard", icon: <HomeIcon className="h-5 w-5 text-black" />, path: "/hr-dashboard" },
         { name: "Employees", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-emp-mgmt" },
+        { name: "Register New Employee", icon: <UserPlusIcon className="h-5 w-5 text-black" />, path: "/hr-register-emp" },
         { name: "Profile", icon: <UserIcon className="h-5 w-5 text-black" />, path: "/hr-profile" },
     ];
 
