@@ -5,6 +5,7 @@ import HRLogin from './pages/HRstaff/HRLogin';
 import Profile from './pages/Employee/Profile';
 import HRDashboard from './pages/HRstaff/HRDashboard';
 import EmployeeManagement from "./pages/HRstaff/EmployeeManagement";
+import HRProfile from "./pages/HRstaff/HRProfile";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/hr-dashboard" element={<HRDashboard />} />
         <Route path="/hr-emp-mgmt" element={<EmployeeManagement />} />
+        <Route path="/hr-profile" element={<HRProfile />} />
       </Routes>
     </Router>
   );
