@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
-# 1️⃣ Custom User Manager
+# Custom User Manager
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, role="EMPLOYEE", **extra_fields):
         if not email:
@@ -15,7 +15,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("role", "ADMIN")  # force superuser role
+        extra_fields.setdefault("role", "ADMIN") 
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
@@ -24,26 +24,69 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-# 2️⃣ Custom User model
+# Custom User model
 class User(AbstractUser):
-    username = None  # remove username
+    username = None 
     email = models.EmailField(unique=True)
-
     ROLE_CHOICES = (
         ("ADMIN", "Admin"),
         ("HR", "HR"),
         ("EMPLOYEE", "Employee"),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="EMPLOYEE")
-
     job_title = models.CharField(max_length=100, blank=True, null=True)
+    branch = models.ForeignKey("Branch", on_delete=models.SET_NULL, null=True, blank=True) 
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []  # no other required fields
+    REQUIRED_FIELDS = []  
 
     objects = UserManager()
 
     def __str__(self):
         return self.email
 
+# Company branches model 
+class Branch(models.Model):
+    name = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
+# Employee facial data  model 
+class FaceData(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    embedding = models.JSONField() 
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} face data"
+    
+
+# Clock in Clock out attendance model 
+class Attendance(models.Model):
+    SESSION_CHOICES = [
+        ("MORNING", "Morning"),
+        ("LUNCH", "Lunch"),
+        ("AFTERNOON", "Afternoon"),
+        ("EVENING", "Evening"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    session = models.CharField(max_length=10, choices=SESSION_CHOICES)
+    clock_in_time = models.TimeField(null=True, blank=True)
+    clock_out_time = models.TimeField(null=True, blank=True)
+    lat = models.FloatField()
+    lon = models.FloatField()
+    verified = models.BooleanField(default=False)  # verified with face + location
+
+    class Meta:
+        unique_together = ("user", "date", "session")  # prevent duplicate attendance
+
+    def __str__(self):
+        return f"{self.user.email} - {self.date} - {self.session}"

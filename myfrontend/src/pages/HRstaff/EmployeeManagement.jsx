@@ -78,23 +78,38 @@ function EmployeeManagement() {
     };
 
     const handleSave = async (id) => {
-        try {
-            const token = currentUser.access; // JWT token
-            // Await the PUT request and store response
-            const res = await axios.put(
-                `http://localhost:8000/api/employees/${id}/`,
-                formData,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+        if (!currentUser) return; 
 
-            // Update local list
-            setEmployees(employees.map(emp => emp.id === id ? res.data : emp));
-            setEditingId(null);
-        } catch (err) {
-            console.error("Failed to update employee:", err.response || err);
+        const sendUpdate = async (token) => {
+            try {
+                // const token = currentUser.access; // JWT token
+                // // Await the PUT request and store response
+                // const res = await axios.put(
+                //     `http://localhost:8000/api/employees/${id}/`,
+                //     formData,
+                //     {
+                //         headers: { Authorization: `Bearer ${token}` },
+                //     }
+                // );
+                const res = await axios.put(
+                    `http://localhost:8000/api/employees/${id}/`,
+                    formData,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                // Update local list
+                setEmployees(employees.map(emp => emp.id === id ? res.data : emp));
+                setEditingId(null);
+
+            } catch (err) {
+                if (err.response?.status === 401) {
+                    const newToken = await refreshAccessToken();
+                    if (newToken) await sendUpdate(newToken);
+                } else {
+                    console.error("Failed to update employee:", err.response || err);
+                }
+            }
         }
+        await sendUpdate(currentUser.access);
     };
 
 

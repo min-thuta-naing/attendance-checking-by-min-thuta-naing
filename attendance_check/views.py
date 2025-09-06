@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework import generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User
-from .serializers import LoginSerializer, HRStaffListSerializer,EmployeeListSerializer, EmployeeRegisterSerializer
+from .models import User, Branch
+from .serializers import LoginSerializer, HRStaffListSerializer,EmployeeListSerializer, EmployeeRegisterSerializer, BranchSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
@@ -113,34 +114,34 @@ class EmployeeListView(APIView):
     
 
 # view for which HR can update some field of all HR admin staff 
-class HRStaffListUpdateView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+# class HRStaffListUpdateView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        # Only HR should access this endpoint
-        if request.user.role != "HR":
-            return Response({"error": "Forbidden"}, status=403)
+#     def get(self, request):
+#         # Only HR should access this endpoint
+#         if request.user.role != "HR":
+#             return Response({"error": "Forbidden"}, status=403)
 
-        hrstaff = User.objects.filter(role="HR")
-        serializer = EmployeeListSerializer(hrstaff, many=True)
-        return Response(serializer.data)
+#         hrstaff = User.objects.filter(role="HR")
+#         serializer = EmployeeListSerializer(hrstaff, many=True)
+#         return Response(serializer.data)
 
-    def put(self, request, pk):
-        # Only HR can update first_name, last_name, job_title
-        if request.user.role != "HR":
-            return Response({"error": "Forbidden"}, status=403)
+#     def put(self, request, pk):
+#         # Only HR can update first_name, last_name, job_title
+#         if request.user.role != "HR":
+#             return Response({"error": "Forbidden"}, status=403)
 
-        try:
-            hrstaff = User.objects.get(pk=pk, role="HR")
-        except User.DoesNotExist:
-            return Response({"error": "Employee not found"}, status=404)
+#         try:
+#             hrstaff = User.objects.get(pk=pk, role="HR")
+#         except User.DoesNotExist:
+#             return Response({"error": "Employee not found"}, status=404)
 
-        serializer = HRStaffListSerializer(hrstaff, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+#         serializer = HRStaffListSerializer(hrstaff, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=400)
     
     
 # view for which HR can update some field of all employees 
@@ -220,10 +221,18 @@ class RegisterEmployeeView(APIView):
                 "email": user.email,
                 "job_title": user.job_title,
                 "role": user.role,
+                "branch": user.branch.id if user.branch else None,   # return branch ID
+                "branch_name": user.branch.name if user.branch else None,  # optional: also return name
                 "is_staff": user.is_staff,
                 "is_superuser": user.is_superuser
             }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        print(serializer.errors) 
+        errors = serializer.errors
+        if "email" in errors:
+            return Response({"error": "This email is already registered. Please use a different one."}, status=400)
+        return Response({"error": "Invalid data. Please check all fields."}, status=400)
+    
     
 # view where employee and HR staff can change their password 
 class ChangePasswordView(APIView):
@@ -252,3 +261,9 @@ class ChangePasswordView(APIView):
         user.save()
 
         return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
+    
+
+class BranchListView(generics.ListAPIView):
+    queryset = Branch.objects.all()
+    serializer_class = BranchSerializer
+    permission_classes = [permissions.IsAuthenticated] 

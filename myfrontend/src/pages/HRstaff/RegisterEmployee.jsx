@@ -17,26 +17,55 @@ function RegisterEmployee() {
         last_name: "",
         job_title: "",
         email: "",
-        role: "EMPLOYEE", 
+        branch: null,
     });
+    const [branches, setBranches] = useState([]);
     const [message, setMessage] = useState("");
     const [popupMessage, setPopupMessage] = useState("");
     const navigate = useNavigate();
 
-    // Load current HR user
+    // fetching the currently logged in user 
     useEffect(() => {
+
         const user = JSON.parse(localStorage.getItem("currentUser"));
         if (!user) return;
         setCurrentUser(user);
     }, []);
 
+    // fetching the branches stored in the branch table 
+    useEffect(() => {
+        if (!currentUser) return;
+
+        const fetchBranches = async () => {
+            try {
+                const token = currentUser.access;
+                const res = await axios.get("http://localhost:8000/api/branches/", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setBranches(res.data);
+            } catch (err) {
+                if (err.response?.status === 401) {
+                    const newToken = await refreshAccessToken();
+                    if (!newToken) return;
+                    const res = await axios.get("http://localhost:8000/api/branches/", {
+                        headers: { Authorization: `Bearer ${newToken}` }
+                    });
+                    setBranches(res.data);
+                } else {
+                    console.error("Failed to fetch branches:", err);
+                }
+            }
+        };
+        fetchBranches();
+    }, [currentUser]);
+
+
     // to refresh a new access token when it is expired 
     const refreshAccessToken = async () => {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (!currentUser.refresh) return null; 
+        if (!currentUser.refresh) return null;
 
         try {
-            // const user = JSON.parse(localStorage.getItem("currentUser"));
             const res = await axios.post("http://localhost:8000/api/token/refresh/", {
                 refresh: currentUser.refresh,
             });
@@ -48,9 +77,10 @@ function RegisterEmployee() {
             console.error("Failed to refresh token:", err);
             localStorage.removeItem("currentUser");
             navigate("/hrlogin");
-            return null; 
+            return null;
         }
     };
+
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -58,62 +88,48 @@ function RegisterEmployee() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!currentUser) return;
 
         const payload = {
             first_name: formData.first_name,
             last_name: formData.last_name,
             email: formData.email,
             job_title: formData.job_title,
-            role: formData.role,
+            role: "EMPLOYEE",
+            branch: parseInt(formData.branch, 10)
         };
 
-        let token = currentUser.access;
+        const sendRequest = async (token) => {
+            try {
+                const res = await axios.post(
+                    "http://localhost:8000/api/employees/register/",
+                    payload,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-        try {
-            await axios.post(
-                "http://localhost:8000/api/employees/register/",
-                payload,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            setPopupMessage({ message: "Employee registered successfully!", type: "success" });
-            setFormData({
-                first_name: "",
-                last_name: "",
-                job_title: "",
-                email: "",
-                role: "EMPLOYEE", 
-            });
-
-        } catch (err) {
-            // If 401, try refreshing token
-            if (err.response?.status === 401) {
-                token = await refreshAccessToken();
-                if (!token) return; // failed to refresh
-                try {
-                    await axios.post(
-                        "http://localhost:8000/api/employees/register/",
-                        payload,
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    console.log("Token:", currentUser.access);
-                    setPopupMessage({ message: "Employee registered successfully!", type: "success" });
-                    setFormData({
-                        first_name: "",
-                        last_name: "",
-                        job_title: "",
-                        email: "",
-                        role: "EMPLOYEE", 
-                    });
-                } catch (innerErr) {
-                    console.error(innerErr);
-                    setPopupMessage({ message: "Failed to register employee. Try again!", type: "error" });
+                setPopupMessage({ message: "Employee registered successfully!", type: "success" });
+                setFormData({
+                    first_name: "",
+                    last_name: "",
+                    job_title: "",
+                    email: "",
+                    role: "EMPLOYEE",
+                    branch: null,
+                });
+            } catch (err) {
+                if (err.response?.status === 401) {
+                    // token expired, try refreshing
+                    const newToken = await refreshAccessToken();
+                    if (newToken) await sendRequest(newToken);
+                } else {
+                    const errorMsg = err.response?.data?.error || "Failed to register employee. Try again!";
+                    setPopupMessage({ message: errorMsg, type: "error" });
+                    console.error(err);
                 }
-            } else {
-                console.error(err);
-                setPopupMessage({ message: "Failed to register employee. Try again!", type: "error" });
             }
         }
+
+        await sendRequest(currentUser.access);
     };
 
     if (!currentUser) {
@@ -153,11 +169,29 @@ function RegisterEmployee() {
                             name="email"
                         />
 
-                        <RoleSelectComponent
+                        {/* <RoleSelectComponent
                             value={formData.role}
                             onChange={handleChange}
                             name="role"
-                        />
+                        /> */}
+
+                        <label htmlFor="branch" className="block text-sm font-medium text-gray-700">
+                            Branch
+                        </label>
+                        <select
+                            name="branch"
+                            value={formData.branch || ""}
+                            onChange={handleChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            required
+                        >
+                            <option value="">Select a branch</option>
+                            {branches.map((branch) => (
+                                <option key={branch.id} value={branch.id}>
+                                    {branch.name}
+                                </option>
+                            ))}
+                        </select>
 
                         <div className="text-sm text-gray-700 mb-4">
                             The default password is <strong>Default@123</strong>. Please inform the employee to change it later.
