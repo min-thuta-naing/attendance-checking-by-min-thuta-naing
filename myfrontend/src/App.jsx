@@ -8,6 +8,7 @@ import EmployeeManagement from "./pages/HRstaff/EmployeeManagement";
 import HRProfile from "./pages/HRstaff/HRProfile";
 import RegisterEmployee from './pages/HRstaff/RegisterEmployee';
 import HRAdminManagement from './pages/HRstaff/HRAdminManagement';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/hr-staff-all-list" element={<HRAdminManagement />} />
         <Route path="/hr-profile" element={<HRProfile />} />
         <Route path="/hr-register-emp" element={<RegisterEmployee/>}/> 
+        <Route path="/change-password" element={<ChangePasswordPage/>}/> 
       </Routes>
     </Router>
   );
