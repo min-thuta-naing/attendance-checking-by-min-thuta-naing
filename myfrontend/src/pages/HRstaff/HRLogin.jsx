@@ -45,6 +45,7 @@ function HRLogin() {
                     <EmailInputComponent value={email} onChange={(e) => setEmail(e.target.value)} />
                     <PasswordInputComponent
                         value={password}
+                        label="Password"
                         onChange={(e) => setPassword(e.target.value)}
                         showPassword={showPassword}
                         toggleShowPassword={() => setShowPassword(!showPassword)}

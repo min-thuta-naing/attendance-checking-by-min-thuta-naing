@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
-function PasswordInputComponent({ value, onChange, name }) {
+function PasswordInputComponent({ value, onChange, name, label }) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
         <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
-                Password
+                {label}
             </label>
             <input
                 type={showPassword ? "text" : "password"}
