@@ -100,7 +100,7 @@ function EmployeeManagement() {
 
     if (!currentUser) {
         return (
-            <Loading redirectButtonNav="/hrlogin" />
+            <Loading redirectButtonNav="/" />
         );
     }
 
