@@ -14,10 +14,10 @@ function Sidebar({ currentUser }) {
 
     const menuItems = [
         { name: "Dashboard", icon: <HomeIcon className="h-5 w-5 text-black" />, path: "/hr-dashboard" },
-        { name: "HR Admins", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-staff-all-list" },
-        { name: "Employees", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-emp-mgmt" },
+        { name: "Manage Employees", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-emp-mgmt" },
         { name: "Register New Employee", icon: <UserPlusIcon className="h-5 w-5 text-black" />, path: "/hr-register-emp" },
         { name: "Profile", icon: <UserIcon className="h-5 w-5 text-black" />, path: "/hr-profile" },
+        { name: "HR Admins", icon: <UsersIcon className="h-5 w-5 text-black" />, path: "/hr-staff-all-list" },
     ];
 
     return (

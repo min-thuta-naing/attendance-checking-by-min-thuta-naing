@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User
+from .models import User, Branch
 from django.contrib.auth.hashers import make_password
 
 class LoginSerializer(serializers.Serializer):
@@ -30,9 +30,9 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 class HRStaffListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # HR can only see these fields and optionally edit these
         fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
-        read_only_fields = ('id', 'email', 'role')
+        read_only_fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
+
 
 # class EmployeeRegisterSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -59,37 +59,32 @@ class HRStaffListSerializer(serializers.ModelSerializer):
 #         user.save()
 #         return user
 
-
+# hr register the new employee 
 class EmployeeRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'job_title', 'role']  
-        extra_kwargs = {
-            'role': {'required': True}, 
-        }
+        fields = ['first_name', 'last_name', 'email', 'job_title', 'branch']  
 
     def create(self, validated_data):
-        # System-controlled fields
-        role = validated_data.get("role", "EMPLOYEE")
-        if role not in ["EMPLOYEE", "HR"]:
-            role = "EMPLOYEE"
-
         user = User(
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             email=validated_data["email"],
             job_title=validated_data.get("job_title", ""),
-            role=role,
+            branch=validated_data["branch"],
+            role="EMPLOYEE", # newly registered employee are all EMPLOYEE role 
             is_staff=True,
             is_superuser=False
         )
 
-        # Default password
+        # setting the default password for the new registerd
         user.set_password("Default@123")
         user.save()
         return user
 
 
-
-
-
+# to display the branch in the employee form 
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id', 'name'] 

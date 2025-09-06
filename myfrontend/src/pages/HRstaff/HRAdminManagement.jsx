@@ -68,35 +68,6 @@ function HRAdminManagement() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleEdit = (hrstaff) => {
-        setEditingId(hrstaff.id);
-        setFormData({
-            first_name: hrstaff.first_name,
-            last_name: hrstaff.last_name,
-            job_title: hrstaff.job_title,
-        });
-    };
-
-    const handleSave = async (id) => {
-        try {
-            const token = currentUser.access; // JWT token
-            // Await the PUT request and store response
-            const res = await axios.put(
-                `http://localhost:8000/api/hr-staff-update/${id}/`,
-                formData,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-
-            // Update local list
-            setHRStaff(hrstaff.map(hr => hr.id === id ? res.data : hr));
-            setEditingId(null);
-        } catch (err) {
-            console.error("Failed to update employee:", err.response || err);
-        }
-    };
-
 
     if (!currentUser) {
         return (
@@ -109,10 +80,10 @@ function HRAdminManagement() {
             <Sidebar currentUser={currentUser} />
             <div className="flex-1 pt-20 p-6">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
-                    <h1 className="text-2xl font-bold mb-4 text-center">Employee Management</h1>
+                    <h1 className="text-2xl font-bold mb-4 text-center">HR Admin Accounts</h1>
                     <p className="text-base mb-4 text-start">
-                        The following is the list of all registered employees.<br />
-                        Please click <strong>edit</strong> to update the name or job title.
+                        The following is the list of all registered HR admin accounts.<br />
+                        Please contact <strong>IT team</strong> to update the name or job title.
                     </p>
 
 
@@ -123,60 +94,15 @@ function HRAdminManagement() {
                                 <th className="border px-4 py-2">First Name</th>
                                 <th className="border px-4 py-2">Last Name</th>
                                 <th className="border px-4 py-2">Job Title</th>
-                                <th className="border px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {hrstaff.map(hr => (
                                 <tr key={hr.id}>
                                     <td className="border px-4 py-2">{hr.email}</td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === hr.id ? (
-                                            <input
-                                                name="first_name"
-                                                value={formData.first_name}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : hr.first_name}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === hr.id ? (
-                                            <input
-                                                name="last_name"
-                                                value={formData.last_name}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : hr.last_name}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === hr.id ? (
-                                            <input
-                                                name="job_title"
-                                                value={formData.job_title}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : hr.job_title}
-                                    </td>
-                                    <td className="flex items-center justify-center border px-4 py-2 ">
-                                        {editingId === hr.id ? (
-                                            <button
-                                                onClick={() => handleSave(hr.id)}
-                                                className="px-2 py-1 bg-green-500 text-white rounded"
-                                            >
-                                                Save
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleEdit(hr)}
-                                                className="btn-primary px-2 py-1 bg-blue-500 text-white rounded"
-                                            >
-                                                Edit
-                                            </button>
-                                        )}
-                                    </td>
+                                    <td className="border px-4 py-2">{hr.first_name}</td>
+                                    <td className="border px-4 py-2">{hr.last_name}</td>
+                                    <td className="border px-4 py-2">{hr.job_title}</td>
                                 </tr>
                             ))}
                         </tbody>
