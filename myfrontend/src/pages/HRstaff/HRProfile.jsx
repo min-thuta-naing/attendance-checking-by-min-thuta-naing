@@ -20,7 +20,7 @@ function HRProfile() {
 
     if (!currentUser) {
         return (
-            <Loading redirectButtonNav="/hrlogin" />
+            <Loading redirectButtonNav="/" />
         );
     }
 

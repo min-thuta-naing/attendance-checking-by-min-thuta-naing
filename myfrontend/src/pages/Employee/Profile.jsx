@@ -21,7 +21,7 @@ function Profile() {
 
     if (!currentUser) {
         return (
-            <Loading redirectButtonNav="/login" />
+            <Loading redirectButtonNav="/" />
         );
     }
 

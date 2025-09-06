@@ -21,7 +21,7 @@ function HRDashboard() {
 
     if (!currentUser) {
         return (
-            <Loading redirectButtonNav="/hrlogin" />
+            <Loading redirectButtonNav="/" />
         );
     }
 
