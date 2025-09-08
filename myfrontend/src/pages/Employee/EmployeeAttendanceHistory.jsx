@@ -6,6 +6,7 @@ import Loading from "../../components/Loading";
 import axios from "axios";
 import {useToast} from "../../contexts/ToastContext";
 import LogoutConfirmation from "../../components/LogoutConfirmation";
+import BASE_URL from "../../api";
 
 function EmployeeAttendanceHistory() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -54,7 +55,7 @@ function EmployeeAttendanceHistory() {
         if (!currentUser?.refresh) return null;
 
         try {
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: currentUser.refresh,
             });
             const updatedUser = { ...currentUser, access: res.data.access };
@@ -74,7 +75,7 @@ function EmployeeAttendanceHistory() {
 
         const fetchAttendance = async (token) => {
             try {
-                const res = await axios.get("http://localhost:8000/api/attendance/my/", {
+                const res = await axios.get(`${BASE_URL}/api/attendance/my/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setAttendance(res.data);
@@ -202,7 +203,7 @@ function EmployeeAttendanceHistory() {
                 onCancel={() => setShowLogoutConfirm(false)}
                 onConfirm={handleLogout}
             />
-            
+
         </div>
     );
 }

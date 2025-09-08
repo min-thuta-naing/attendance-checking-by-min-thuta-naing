@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "../../contexts/ToastContext";
 import Loading from "../../components/Loading";
 import PasswordInputComponent from "../../components/PasswordInputComponent";
+import BASE_URL from "../../api";
 
 function ChangePasswordPage() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -31,7 +32,7 @@ function ChangePasswordPage() {
     const refreshAccessToken = async () => {
         try {
             const user = JSON.parse(localStorage.getItem("currentUser"));
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: user.refresh,
             });
             const updatedUser = { ...user, access: res.data.access };
@@ -50,7 +51,7 @@ function ChangePasswordPage() {
 
         try {
             const res = await axios.post(
-                "http://localhost:8000/api/change-password/",
+                `${BASE_URL}/api/change-password/`,
                 formData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -60,7 +61,7 @@ function ChangePasswordPage() {
                 new_password: "",
                 confirm_password: "",
             });
-            
+
             localStorage.removeItem("currentUser");
             setCurrentUser(null);
 

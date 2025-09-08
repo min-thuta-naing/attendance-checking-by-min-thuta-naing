@@ -4,6 +4,7 @@ import axios from "axios";
 import Sidebar from "../../components/Sidebar";
 import { useToast } from "../../contexts/ToastContext";
 import { CameraIcon, XMarkIcon, VideoCameraIcon } from "@heroicons/react/24/outline";
+import BASE_URL from "../../api";
 
 function RegisterEmpFacialData() {
     const { id } = useParams();
@@ -23,7 +24,7 @@ function RegisterEmpFacialData() {
         if (!user?.refresh) return null;
 
         try {
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: user.refresh,
             });
             const updatedUser = { ...user, access: res.data.access };
@@ -39,7 +40,7 @@ function RegisterEmpFacialData() {
 
     const fetchEmployee = async (token) => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/employee/${id}/`, {
+            const res = await axios.get(`${BASE_URL}/api/employee/${id}/`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEmployee(res.data);
@@ -181,7 +182,7 @@ function RegisterEmpFacialData() {
 
         const sendRequest = async (token) => {
             try {
-                await axios.post("http://localhost:8000/api/face-data/register/", formData, {
+                await axios.post(`${BASE_URL}/api/face-data/register/`, formData, {
                     headers: { 
                         Authorization: `Bearer ${token}`, 
                         "Content-Type": "multipart/form-data" 

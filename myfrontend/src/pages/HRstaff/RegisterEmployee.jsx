@@ -8,6 +8,7 @@ import EmailInputComponent from "../../components/EmailInputComponent";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {useToast} from "../../contexts/ToastContext";
+import BASE_URL from "../../api";
 
 function RegisterEmployee() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -36,7 +37,7 @@ function RegisterEmployee() {
         const fetchBranches = async () => {
             try {
                 const token = currentUser.access;
-                const res = await axios.get("http://localhost:8000/api/branches/", {
+                const res = await axios.get(`${BASE_URL}/api/branches/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setBranches(res.data);
@@ -44,7 +45,7 @@ function RegisterEmployee() {
                 if (err.response?.status === 401) {
                     const newToken = await refreshAccessToken();
                     if (!newToken) return;
-                    const res = await axios.get("http://localhost:8000/api/branches/", {
+                    const res = await axios.get(`${BASE_URL}/api/branches/`, {
                         headers: { Authorization: `Bearer ${newToken}` }
                     });
                     setBranches(res.data);
@@ -63,7 +64,7 @@ function RegisterEmployee() {
         if (!currentUser.refresh) return null;
 
         try {
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: currentUser.refresh,
             });
             const updatedUser = { ...currentUser, access: res.data.access };
@@ -99,7 +100,7 @@ function RegisterEmployee() {
         const sendRequest = async (token) => {
             try {
                 const res = await axios.post(
-                    "http://localhost:8000/api/employees/register/",
+                    `${BASE_URL}/api/employees/register/`,
                     payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

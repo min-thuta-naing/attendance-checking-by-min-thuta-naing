@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import { HomeIcon, ArrowRightOnRectangleIcon, PencilIcon, UserIcon } from "@heroicons/react/24/outline";
 import Loading from "../../components/Loading";
 import PasswordInputComponent from "../../components/PasswordInputComponent";
+import BASE_URL from "../../api";
 
 function EmployeeChangePasswordPage() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -36,7 +37,7 @@ function EmployeeChangePasswordPage() {
         const token = currentUser.access;
 
         try {
-            const res = await fetch("http://localhost:8000/api/employee/change-password/", {
+            const res = await fetch(`${BASE_URL}/api/employee/change-password/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
