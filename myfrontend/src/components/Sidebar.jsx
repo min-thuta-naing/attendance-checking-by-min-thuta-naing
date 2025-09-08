@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { UserIcon, ArrowRightOnRectangleIcon, HomeIcon, UsersIcon, Bars4Icon, XMarkIcon, BuildingOffice2Icon, UserPlusIcon } from "@heroicons/react/24/outline";
+import LogoutConfirmation from "./LogoutConfirmation";
 
 function Sidebar({ currentUser }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    
 
     const handleLogout = () => {
         localStorage.removeItem("currentUser");
@@ -79,8 +82,8 @@ function Sidebar({ currentUser }) {
 
                 <div className="mt-auto">
                     <button
-                        onClick={handleLogout}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-[#AF3E3E] rounded hover:bg-[#DBDFEA] transition"
+                        onClick={()=> setShowLogoutConfirm(true)}
+                        className="btn-warning flex items-center space-x-2 w-full px-4 py-2 rounded transition"
                     >
                         <ArrowRightOnRectangleIcon className="h-5 w-5" />
                         <span>Log Out</span>
@@ -94,6 +97,15 @@ function Sidebar({ currentUser }) {
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
+
+            <LogoutConfirmation
+                isOpen={showLogoutConfirm}
+                title="Confirm to Logout"
+                message="Are you sure you want to log out?"
+                onCancel={() => setShowLogoutConfirm(false)}
+                onConfirm={handleLogout}
+            />
+
         </>
     );
 }

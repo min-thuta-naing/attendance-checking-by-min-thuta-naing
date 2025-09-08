@@ -4,11 +4,13 @@ import Header from "../../components/Header";
 import { ArrowLeftIcon, XCircleIcon, CheckCircleIcon, UserIcon, HomeIcon, ArrowRightOnRectangleIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Loading from "../../components/Loading";
 import axios from "axios";
-import { useToast } from "../../contexts/ToastContext";
+import {useToast} from "../../contexts/ToastContext";
+import LogoutConfirmation from "../../components/LogoutConfirmation";
 
 function EmployeeAttendanceHistory() {
     const [currentUser, setCurrentUser] = useState(null);
     const [attendance, setAttendance] = useState([]);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
     const navigate = useNavigate();
     const {showToast} = useToast(); 
 
@@ -102,7 +104,7 @@ function EmployeeAttendanceHistory() {
                     {label: "Go to Home", icon: <HomeIcon className="h-6 w-6" />, onClick: () => navigate("/home")},
                     {label: "Profile", icon: <UserIcon className="h-6 w-6" />, onClick: () => navigate("/profile")},
                     {label: "Change Password", icon: <PencilIcon className="h-6 w-6" />, onClick: () => navigate("/change-password")},
-                    {label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => handleLogout()},
+                    {label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => setShowLogoutConfirm(true)},
                 ]}
             />
             <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
@@ -192,6 +194,15 @@ function EmployeeAttendanceHistory() {
                 </div>
 
             </div>
+
+            <LogoutConfirmation
+                isOpen={showLogoutConfirm}
+                title="Confirm to Logout"
+                message="Are you sure you want to log out?"
+                onCancel={() => setShowLogoutConfirm(false)}
+                onConfirm={handleLogout}
+            />
+            
         </div>
     );
 }
