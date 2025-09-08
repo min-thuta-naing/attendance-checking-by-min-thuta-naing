@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { UserIcon, ArrowRightOnRectangleIcon, ClockIcon, PencilIcon, VideoCameraIcon, CameraIcon } from "@heroicons/react/24/outline";
 import Loading from "../../components/Loading";
 import { useToast } from "../../contexts/ToastContext";
+import LogoutConfirmation from "../../components/LogoutConfirmation";
 
 function Home() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -13,7 +14,8 @@ function Home() {
     const streamRef = useRef(null);
     const videoRef = useRef(null);
     const [cameraOn, setCameraOn] = useState(false);
-    const {showToast} = useToast(); 
+    const {showToast} = useToast();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -200,7 +202,7 @@ function Home() {
                     {label: "Profile", icon: <UserIcon className="h-6 w-6" />, onClick: () => navigate("/profile")},
                     {label: "Attendance History", icon: <ClockIcon className="h-6 w-6" />, onClick: () => navigate("/emp-attendance-history")},
                     {label: "Change Password", icon: <PencilIcon className="h-6 w-6" />, onClick: () => navigate("/change-password")},
-                    {label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => handleLogout()},
+                    {label: "Log Out", icon: <ArrowRightOnRectangleIcon className="h-6 w-6" />, onClick: () => setShowLogoutConfirm(true)},
                 ]}
             />
             <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
@@ -260,8 +262,14 @@ function Home() {
                         Clock Out
                     </button>
                 </div>
-
             </div>
+            <LogoutConfirmation
+                isOpen={showLogoutConfirm}
+                title="Confirm to Logout"
+                message="Are you sure you want to log out?"
+                onCancel={() => setShowLogoutConfirm(false)}
+                onConfirm={handleLogout}
+            />
         </div>
     );
 }

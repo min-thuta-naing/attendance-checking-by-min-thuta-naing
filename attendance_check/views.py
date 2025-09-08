@@ -227,7 +227,7 @@ class RegisterFaceDataView(APIView):
         return Response(serializer.errors, status=400)
 
 
-def verify_face_with_similarity(captured_base64, stored_embeddings_list, threshold=0.7):
+def verify_face_with_similarity(captured_base64, stored_embeddings_list, threshold=0.6):
     try:
         #to decode Base64
         format, imgstr = captured_base64.split(";base64,")
