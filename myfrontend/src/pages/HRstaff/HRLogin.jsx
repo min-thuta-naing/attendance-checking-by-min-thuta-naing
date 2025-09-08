@@ -21,9 +21,8 @@ function HRLogin() {
                 password,
             });
 
-            // here save the user info of logged in user and JWT tokens 
             localStorage.setItem("currentUser", JSON.stringify({
-                ...response.data,  // includes email, role, access, etc.
+                ...response.data,  
             }));
 
             console.log("Login successful:", response.data);
@@ -36,10 +35,10 @@ function HRLogin() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen w-full random-gradient-bg">
-            <div className="w-full max-w-md bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
+        <div className="flex items-center justify-center min-h-screen w-full bg-gray-300">
+            <div className="w-full max-w-md bg-white backdrop-blur-xl rounded-2xl shadow-lg p-8 border border-white/20">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                    HR Login
+                    HR Admin Login
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <EmailInputComponent value={email} onChange={(e) => setEmail(e.target.value)} />

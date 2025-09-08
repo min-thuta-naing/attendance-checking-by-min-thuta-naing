@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
-# Custom User Manager
+# Custom user manager
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, role="EMPLOYEE", **extra_fields):
         if not email:
@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-# Custom User model
+# Custom user model
 class User(AbstractUser):
     username = None 
     email = models.EmailField(unique=True)
@@ -58,14 +58,15 @@ class Branch(models.Model):
 
 # Employee facial data  model 
 class FaceData(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    embedding = models.JSONField() 
+    employee = models.OneToOneField(User, on_delete=models.CASCADE)
+    # images = models.JSONField(default=list)  
+    embeddings = models.JSONField()  
     last_updated = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.email} face data"
-    
+        return f"{self.employee.email} face data"
 
+    
 # Clock in Clock out attendance model 
 class Attendance(models.Model):
     SESSION_CHOICES = [
@@ -74,19 +75,18 @@ class Attendance(models.Model):
         ("AFTERNOON", "Afternoon"),
         ("EVENING", "Evening"),
     ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    employee = models.ForeignKey(User, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     session = models.CharField(max_length=10, choices=SESSION_CHOICES)
     clock_in_time = models.TimeField(null=True, blank=True)
     clock_out_time = models.TimeField(null=True, blank=True)
-    lat = models.FloatField()
-    lon = models.FloatField()
-    verified = models.BooleanField(default=False)  # verified with face + location
+    emp_latitude = models.FloatField()
+    emp_longitude = models.FloatField()
+    verified = models.BooleanField(default=False)  
 
     class Meta:
-        unique_together = ("user", "date", "session")  # prevent duplicate attendance
+        unique_together = ("employee", "date", "session")  
 
     def __str__(self):
-        return f"{self.user.email} - {self.date} - {self.session}"
+        return f"{self.employee.email} - {self.date} - {self.session}"

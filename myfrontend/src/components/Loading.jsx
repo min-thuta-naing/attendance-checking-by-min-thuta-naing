@@ -10,9 +10,8 @@ function Loading({redirectButtonNav}) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFEFEF]">
-            <img src={sadImage} alt="Loading" className="w-48 h-48 mb-6" />
-            <p className="mb-4 text-3xl font-semibold">Sorry</p>
-            <p className="mb-4 text-lg font-semibold">Something went wrong.</p>
+            <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin mb-6"></div>
+            <p className="mb-4 text-3xl font-semibold">Loading ...</p>
             <p className="mb-4 text-lg font-semibold">You need to check the internet or try login again.</p>
             <button
                 onClick={handleLogin}

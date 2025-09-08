@@ -22,9 +22,19 @@ function Login() {
             });
 
             // here save the user info of logged in user and JWT tokens 
-            localStorage.setItem("currentUser", JSON.stringify({
-                ...response.data
-            } ));
+            const data = response.data || {};
+            const currentUser = {
+                id: data.id,
+                email: data.email,
+                first_name: data.first_name,
+                last_name: data.last_name,
+                job_title: data.job_title,
+                role: data.role,
+                access: data.access,
+                refresh: data.refresh,
+                branch_id: data.branch_id ?? (data.branch ? data.branch.id : null),
+            };
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
             console.log("Login successful:", response.data);
             navigate("/home"); 
