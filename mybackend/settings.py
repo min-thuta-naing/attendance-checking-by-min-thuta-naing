@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-$#0^p!#^kqr*a$51jj&4gsi-5+(sv%x_+oasxt8-6^@6snm%ew
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["93.127.128.243"]
 
 
 # Application definition
@@ -83,7 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'attendance_db',      # your DB name
-        'USER': 'minthutanaing', # your DB user
+        'USER': 'thutaminn', # your DB user
         'PASSWORD': '6531503157',  # your DB password
         'HOST': 'localhost',          # for development or Render DB host later
         'PORT': '5432',
@@ -95,14 +95,6 @@ AUTH_USER_MODEL = 'attendance_check.User'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-# i will not use sqlite3 in this project  
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 
 # Password validation
@@ -139,7 +131,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+# STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -149,6 +143,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # connecting with react frontend
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://93.127.128.243:5173", # add your VPS IP + frontend port if using vite
 ]
 
 #JWT auth 
