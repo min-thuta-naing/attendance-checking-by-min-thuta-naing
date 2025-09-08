@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Branch
+from .models import User, Branch, FaceData, Attendance
 from django.contrib.auth.hashers import make_password
+import numpy as np
+from deepface import DeepFace
+from django.core.files.base import ContentFile
+import tempfile
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -23,7 +27,6 @@ class LoginSerializer(serializers.Serializer):
 class EmployeeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # HR can only see these fields and optionally edit these
         fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
         read_only_fields = ('id', 'email', 'role')
 
@@ -33,31 +36,6 @@ class HRStaffListSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
         read_only_fields = ('id', 'email', 'first_name', 'last_name', 'job_title', 'role')
 
-
-# class EmployeeRegisterSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['first_name', 'last_name', 'email', 'job_title', 'password', 'role', 'is_staff', 'is_superuser']
-#         extra_kwargs = {
-#             'password': {'write_only': True},
-#             'role': {'read_only': True}, 
-#             # 'role': {'required': True},
-#             'is_staff': {'read_only': True},
-#             'is_superuser': {'read_only': True},
-#         }
-
-#     def create(self, validated_data):
-#         password = validated_data.pop('password', None)
-#         user = super().create(validated_data)
-#         if password:
-#             user.set_password(password)  # hashes the password
-#         else:
-#             user.set_password("Default@123")  # default password
-#         user.role = "EMPLOYEE"    # system-controlled
-#         user.is_superuser = False # system-controlled
-#         user.is_staff = True      # must be staff
-#         user.save()
-#         return user
 
 # hr register the new employee 
 class EmployeeRegisterSerializer(serializers.ModelSerializer):
@@ -72,12 +50,12 @@ class EmployeeRegisterSerializer(serializers.ModelSerializer):
             email=validated_data["email"],
             job_title=validated_data.get("job_title", ""),
             branch=validated_data["branch"],
-            role="EMPLOYEE", # newly registered employee are all EMPLOYEE role 
+            role="EMPLOYEE",
             is_staff=True,
             is_superuser=False
         )
 
-        # setting the default password for the new registerd
+        #to make the default password for the newly registerd emp 
         user.set_password("Default@123")
         user.save()
         return user
@@ -88,3 +66,70 @@ class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         fields = ['id', 'name'] 
+
+
+class FaceDataSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(
+        child=serializers.ImageField(), write_only=True, required=True
+    )
+
+    class Meta:
+        model = FaceData
+        fields = ["employee", "images", "embeddings", "last_updated"]
+        read_only_fields = ["embeddings", "last_updated"]
+
+    def create(self, validated_data):
+        employee = validated_data.get("employee")
+        images = validated_data.pop("images")  
+
+        embeddings = []
+
+        for image_file in images:
+            # Save uploaded file temporarily
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+                for chunk in image_file.chunks():
+                    temp_file.write(chunk)
+                temp_file.flush()
+                temp_file_path = temp_file.name
+
+            try:
+                emb = DeepFace.represent(
+                    img_path=temp_file_path,
+                    model_name="VGG-Face",
+                    enforce_detection=True
+                )[0]["embedding"]
+                embeddings.append(emb)
+            except Exception as e:
+                raise serializers.ValidationError({
+                    "images": f"Face could not be detected: {str(e)}"
+                })
+
+        # Average embeddings
+        validated_data["embeddings"] = embeddings
+
+        return super().create(validated_data)
+
+    
+
+# serializer for the facial verification for attendance of emp 
+class AttendanceSerializer(serializers.ModelSerializer):
+    employee_email = serializers.CharField(source="employee.email", read_only=True)
+    branch_name = serializers.CharField(source="branch.name", read_only=True)
+
+    class Meta:
+        model = Attendance
+        fields = [
+            "id",
+            "employee",
+            "employee_email",
+            "branch",
+            "branch_name",
+            "date",
+            "session",
+            "clock_in_time",
+            "clock_out_time",
+            "emp_latitude",
+            "emp_longitude",
+            "verified",
+        ]
+        read_only_fields = ["id", "date", "verified", "employee"]

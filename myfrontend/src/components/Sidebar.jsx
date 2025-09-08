@@ -36,9 +36,8 @@ function Sidebar({ currentUser }) {
 
             <div
                 className={`fixed top-0 left-0 h-screen w-64 bg-[#ACB1D6] shadow-md flex flex-col p-6 transform transition-transform z-40
-                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0 sm:static sm:h-screen sm:w-64`}
+                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}
             >
-                {/* Close button only on mobile */}
                 <div className="sm:hidden flex justify-end mb-6">
                     <button
                         onClick={() => setIsSidebarOpen(false)}
@@ -66,7 +65,7 @@ function Sidebar({ currentUser }) {
                                 key={item.name}
                                 onClick={() => {
                                     navigate(item.path);
-                                    setIsSidebarOpen(false); // close mobile sidebar after click
+                                    setIsSidebarOpen(false);
                                 }}
                                 className={`flex items-center space-x-3 cursor-pointer p-2 rounded 
                                     ${location.pathname === item.path ? "bg-[#DBDFEA]" : "hover:bg-[#DBDFEA]"} `}
@@ -89,7 +88,6 @@ function Sidebar({ currentUser }) {
                 </div>
             </div>
 
-            {/* Optional: semi-transparent overlay when sidebar is open on mobile */}
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black opacity-50 z-30 sm:hidden"

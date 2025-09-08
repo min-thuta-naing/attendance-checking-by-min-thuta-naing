@@ -15,7 +15,6 @@ function EmployeeManagement() {
         const user = JSON.parse(localStorage.getItem("currentUser"));
         setCurrentUser(user);
 
-        // only HR with access can see the employee list 
         if (user?.role === "HR" && user?.access) {  
             fetchEmployees(user.access);
         }
@@ -32,9 +31,8 @@ function EmployeeManagement() {
             setEmployees(res.data);
         } catch (err) {
             if (err.response?.status === 401) {
-                // refresh if access token is expired 
                 const newToken = await refreshAccessToken();
-                if (newToken) fetchEmployees(newToken); // fetch employee lists again with new token 
+                if (newToken) fetchEmployees(newToken); 
             } else {
                 console.error("Failed to fetch employees:", err);
             }
@@ -52,11 +50,10 @@ function EmployeeManagement() {
             });
             const updatedUser = { ...currentUser, access: res.data.access };
             localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-            setCurrentUser(updatedUser); // update state
+            setCurrentUser(updatedUser); 
             return res.data.access;
         } catch (err) {
             console.error("Failed to refresh token:", err);
-            // token refresh failed → force logout
             localStorage.removeItem("currentUser");
             navigate("/hrlogin");
             return null;
@@ -82,21 +79,11 @@ function EmployeeManagement() {
 
         const sendUpdate = async (token) => {
             try {
-                // const token = currentUser.access; // JWT token
-                // // Await the PUT request and store response
-                // const res = await axios.put(
-                //     `http://localhost:8000/api/employees/${id}/`,
-                //     formData,
-                //     {
-                //         headers: { Authorization: `Bearer ${token}` },
-                //     }
-                // );
                 const res = await axios.put(
                     `http://localhost:8000/api/employees/${id}/`,
                     formData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                // Update local list
                 setEmployees(employees.map(emp => emp.id === id ? res.data : emp));
                 setEditingId(null);
 
@@ -120,9 +107,9 @@ function EmployeeManagement() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen bg-gray-100">
             <Sidebar currentUser={currentUser} />
-            <div className="flex-1 pt-20 p-6">
+            <div className="sm:ml-64 p-6 pt-20 overflow-y-auto h-screen">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
                     <h1 className="text-2xl font-bold mb-4 text-center">Employee Management</h1>
                     <p className="text-base mb-4 text-start">
@@ -130,72 +117,86 @@ function EmployeeManagement() {
                         Please click <strong>edit</strong> to update the name or job title.
                     </p>
 
-
-                    <table className="w-full table-auto border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border px-4 py-2">Email</th>
-                                <th className="border px-4 py-2">First Name</th>
-                                <th className="border px-4 py-2">Last Name</th>
-                                <th className="border px-4 py-2">Job Title</th>
-                                <th className="border px-4 py-2">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {employees.map(emp => (
-                                <tr key={emp.id}>
-                                    <td className="border px-4 py-2">{emp.email}</td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === emp.id ? (
-                                            <input
-                                                name="first_name"
-                                                value={formData.first_name}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : emp.first_name}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === emp.id ? (
-                                            <input
-                                                name="last_name"
-                                                value={formData.last_name}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : emp.last_name}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {editingId === emp.id ? (
-                                            <input
-                                                name="job_title"
-                                                value={formData.job_title}
-                                                onChange={handleChange}
-                                                className="border p-1 w-full"
-                                            />
-                                        ) : emp.job_title}
-                                    </td>
-                                    <td className="flex items-center justify-center border px-4 py-2 ">
-                                        {editingId === emp.id ? (
-                                            <button
-                                                onClick={() => handleSave(emp.id)}
-                                                className="px-2 py-1 bg-green-500 text-white rounded"
-                                            >
-                                                Save
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleEdit(emp)}
-                                                className="btn-primary px-2 py-1 bg-blue-500 text-white rounded"
-                                            >
-                                                Edit
-                                            </button>
-                                        )}
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse rounded-lg overflow-hidden shadow-md">
+                            <thead className="bg-[#8294C4] text-white">
+                                <tr>
+                                    <th className="px-6 py-3 font-semibold">Email</th>
+                                    <th className="px-6 py-3 font-semibold">First Name</th>
+                                    <th className="px-6 py-3 font-semibold">Last Name</th>
+                                    <th className="px-6 py-3 font-semibold">Job Title</th>
+                                    <th className="px-6 py-3 font-semibold text-center">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {employees.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-6 text-gray-500">
+                                            No employees found
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    employees.map((emp, idx) => (
+                                        <tr
+                                            key={emp.id}
+                                            className={`transition-colors ${
+                                                idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                            } hover:bg-[#DBDFEA]`}
+                                        >
+                                            <td className="px-6 py-3">{emp.email}</td>
+                                            <td className="px-6 py-3">
+                                                {editingId === emp.id ? (
+                                                    <input
+                                                        name="first_name"
+                                                        value={formData.first_name}
+                                                        onChange={handleChange}
+                                                        className="border rounded px-2 py-1 w-full"
+                                                    />
+                                                ) : emp.first_name}
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {editingId === emp.id ? (
+                                                    <input
+                                                        name="last_name"
+                                                        value={formData.last_name}
+                                                        onChange={handleChange}
+                                                        className="border rounded px-2 py-1 w-full"
+                                                    />
+                                                ) : emp.last_name}
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {editingId === emp.id ? (
+                                                    <input
+                                                        name="job_title"
+                                                        value={formData.job_title}
+                                                        onChange={handleChange}
+                                                        className="border rounded px-2 py-1 w-full"
+                                                    />
+                                                ) : emp.job_title}
+                                            </td>
+                                            <td className="px-6 py-3 flex justify-center">
+                                                {editingId === emp.id ? (
+                                                    <button
+                                                        onClick={() => handleSave(emp.id)}
+                                                        className="px-3 py-1 bg-[#8ABB6C] hover:bg-[#819067] text-white rounded-lg text-sm font-medium"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleEdit(emp)}
+                                                        className="px-3 py-1 bg-[#F08B51] hover:bg-[#BB6653] text-white rounded-lg text-sm font-medium"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
             </div>

@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Sidebar from "../../components/Sidebar";
 import Loading from "../../components/Loading";
 import FirstNameInputComponent from "../../components/FirstNameInputComponent";
 import LastNameInputComponent from "../../components/LastNameInputComponent";
 import JobTitleInputComponent from "../../components/JobTitleInputComponent";
 import EmailInputComponent from "../../components/EmailInputComponent";
-import RoleSelectComponent from "../../components/RoleSelectComponent";
-import ToastNotification from "../../components/ToastNotification";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import {useToast} from "../../contexts/ToastContext";
 
 function RegisterEmployee() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -23,16 +22,14 @@ function RegisterEmployee() {
     const [message, setMessage] = useState("");
     const [popupMessage, setPopupMessage] = useState("");
     const navigate = useNavigate();
+    const {showToast} = useToast(); 
 
-    // fetching the currently logged in user 
     useEffect(() => {
-
         const user = JSON.parse(localStorage.getItem("currentUser"));
         if (!user) return;
         setCurrentUser(user);
     }, []);
 
-    // fetching the branches stored in the branch table 
     useEffect(() => {
         if (!currentUser) return;
 
@@ -107,7 +104,9 @@ function RegisterEmployee() {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                setPopupMessage({ message: "Employee registered successfully!", type: "success" });
+                const employee = res.data; 
+
+                showToast("Employee registered successfully!", "success");
                 setFormData({
                     first_name: "",
                     last_name: "",
@@ -116,14 +115,16 @@ function RegisterEmployee() {
                     role: "EMPLOYEE",
                     branch: null,
                 });
+
+                navigate(`/hr-register-emp/${employee.id}/facial-data`);
+
             } catch (err) {
                 if (err.response?.status === 401) {
-                    // token expired, try refreshing
                     const newToken = await refreshAccessToken();
                     if (newToken) await sendRequest(newToken);
                 } else {
                     const errorMsg = err.response?.data?.error || "Failed to register employee. Try again!";
-                    setPopupMessage({ message: errorMsg, type: "error" });
+                    showToast(errorMsg, "error");
                     console.error(err);
                 }
             }
@@ -139,10 +140,10 @@ function RegisterEmployee() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen bg-gray-100">
             <Sidebar currentUser={currentUser} />
-            <div className="flex-1 pt-16 p-6 relative">
-                <div className="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto text-center">
+            <div className="sm:ml-64 flex items-center justify-center min-h-screen p-6 pt-20">
+                <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
                     <h2 className="text-xl font-bold mb-6">Register New Employee</h2>
 
                     {message && <p className="text-sm mb-4 text-red-500">{message}</p>}
@@ -168,12 +169,6 @@ function RegisterEmployee() {
                             onChange={handleChange}
                             name="email"
                         />
-
-                        {/* <RoleSelectComponent
-                            value={formData.role}
-                            onChange={handleChange}
-                            name="role"
-                        /> */}
 
                         <label htmlFor="branch" className="block text-sm font-medium text-gray-700">
                             Branch
@@ -206,14 +201,6 @@ function RegisterEmployee() {
                         </button>
                     </form>
                 </div>
-
-                {popupMessage && (
-                    <ToastNotification
-                        message={popupMessage.message}
-                        type={popupMessage.type}
-                        onClose={() => setPopupMessage("")}
-                    />
-                )}
 
             </div>
         </div>

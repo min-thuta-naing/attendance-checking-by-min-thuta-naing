@@ -118,6 +118,28 @@ button:focus-visible {
   background-color: #2e2b8a;
 }
 
+/* third button */
+.btn-third {
+  background-color: #c7eec0;
+  color: #000000;
+  border-color: transparent;
+}
+
+.btn-third:hover {
+  background-color: #b3dba2;
+}
+
+/* fourth button */
+.btn-fourth {
+  background-color: #c0dbee;
+  color: #000000;
+  border-color: transparent;
+}
+
+.btn-fourth:hover {
+  background-color: #a2badb;
+}
+
 /* Warning / Delete button */
 .btn-warning {
   background-color: #FF6B6B;

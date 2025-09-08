@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Loading from "../components/Loading";
-import PasswordInputComponent from "../components/PasswordInputComponent";
+import { useToast } from "../../contexts/ToastContext";
+import Loading from "../../components/Loading";
+import PasswordInputComponent from "../../components/PasswordInputComponent";
 
 function ChangePasswordPage() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -13,10 +14,11 @@ function ChangePasswordPage() {
     });
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
+    const {showToast} = useToast(); 
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("currentUser"));
-        if (!user) navigate("/login"); // redirect if not logged in
+        if (!user) navigate("/login"); 
         setCurrentUser(user);
     }, []);
 
@@ -52,19 +54,24 @@ function ChangePasswordPage() {
                 formData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(res.data.message);
+            showToast(res.data.message || "Password changed successfully", "success");
             setFormData({
                 current_password: "",
                 new_password: "",
                 confirm_password: "",
             });
+            
+            localStorage.removeItem("currentUser");
+            setCurrentUser(null);
+
+            navigate("/login");
         } catch (err) {
             if (err.response?.status === 401) {
                 token = await refreshAccessToken();
                 if (!token) return;
-                return handleSubmit(e); 
+                return handleSubmit(e);
             }
-            alert(err.response?.data?.error || "Failed to change password");
+            showToast(err.response?.data?.error || "Failed to change password", "error");
         }
     };
 
@@ -102,33 +109,6 @@ function ChangePasswordPage() {
                             label="Confirm Password"
                         />
 
-                        {/* <label>Current Password</label>
-                        <input
-                            type="password"
-                            name="current_password"
-                            value={formData.current_password}
-                            onChange={handleChange}
-                            className="w-full border rounded p-2"
-                            required
-                        />
-                        <label>New Password</label>
-                        <input
-                            type="password"
-                            name="new_password"
-                            value={formData.new_password}
-                            onChange={handleChange}
-                            className="w-full border rounded p-2"
-                            required
-                        />
-                        <label>Confirm New Password</label>
-                        <input
-                            type="password"
-                            name="confirm_password"
-                            value={formData.confirm_password}
-                            onChange={handleChange}
-                            className="w-full border rounded p-2"
-                            required
-                        /> */}
                         <button
                             type="submit"
                             className="btn-primary w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"

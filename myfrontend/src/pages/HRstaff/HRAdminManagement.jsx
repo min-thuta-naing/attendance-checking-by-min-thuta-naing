@@ -15,7 +15,6 @@ function HRAdminManagement() {
         const user = JSON.parse(localStorage.getItem("currentUser"));
         setCurrentUser(user);
 
-        // only HR with access can see the employee list 
         if (user?.role === "HR" && user?.access) {  
             fetchHRstaff(user.access);
         }
@@ -32,9 +31,8 @@ function HRAdminManagement() {
             setHRStaff(res.data);
         } catch (err) {
             if (err.response?.status === 401) {
-                // refresh if access token is expired 
                 const newToken = await refreshAccessToken();
-                if (newToken) fetchHRstaff(newToken); // fetch employee lists again with new token 
+                if (newToken) fetchHRstaff(newToken); 
             } else {
                 console.error("Failed to fetch HR staff:", err);
             }
@@ -52,11 +50,10 @@ function HRAdminManagement() {
             });
             const updatedUser = { ...currentUser, access: res.data.access };
             localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-            setCurrentUser(updatedUser); // update state
+            setCurrentUser(updatedUser); 
             return res.data.access;
         } catch (err) {
             console.error("Failed to refresh token:", err);
-            // token refresh failed → force logout
             localStorage.removeItem("currentUser");
             navigate("/hrlogin");
             return null;
@@ -76,9 +73,9 @@ function HRAdminManagement() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen bg-gray-100">
             <Sidebar currentUser={currentUser} />
-            <div className="flex-1 pt-20 p-6">
+            <div className="sm:ml-64 p-6 pt-20 overflow-y-auto h-screen">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
                     <h1 className="text-2xl font-bold mb-4 text-center">HR Admin Accounts</h1>
                     <p className="text-base mb-4 text-start">
@@ -86,27 +83,42 @@ function HRAdminManagement() {
                         Please contact <strong>IT team</strong> to update the name or job title.
                     </p>
 
-
-                    <table className="w-full table-auto border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border px-4 py-2">Email</th>
-                                <th className="border px-4 py-2">First Name</th>
-                                <th className="border px-4 py-2">Last Name</th>
-                                <th className="border px-4 py-2">Job Title</th>
+                    <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left border-collapse rounded-lg overflow-hidden shadow-md">
+                        <thead className="bg-[#8294C4] text-white">
+                            <tr>
+                                <th className="px-6 py-3 font-semibold">Email</th>
+                                <th className="px-6 py-3 font-semibold">First Name</th>
+                                <th className="px-6 py-3 font-semibold">Last Name</th>
+                                <th className="px-6 py-3 font-semibold">Job Title</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {hrstaff.map(hr => (
-                                <tr key={hr.id}>
-                                    <td className="border px-4 py-2">{hr.email}</td>
-                                    <td className="border px-4 py-2">{hr.first_name}</td>
-                                    <td className="border px-4 py-2">{hr.last_name}</td>
-                                    <td className="border px-4 py-2">{hr.job_title}</td>
+                            {hrstaff.length === 0 ? (
+                                <tr>
+                                <td colSpan="4" className="text-center py-6 text-gray-500">
+                                    No HR Admin found!
+                                </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                hrstaff.map((hr, idx) => (
+                                <tr
+                                    key={hr.id}
+                                    className={`transition-colors ${
+                                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                    } hover:bg-[#DBDFEA]`}
+                                >
+                                    <td className="px-6 py-3 text-gray-700">{hr.email}</td>
+                                    <td className="px-6 py-3 text-gray-700">{hr.first_name}</td>
+                                    <td className="px-6 py-3 text-gray-700">{hr.last_name}</td>
+                                    <td className="px-6 py-3 text-gray-700">{hr.job_title}</td>
+                                </tr>
+                                ))
+                            )}
                         </tbody>
+
                     </table>
+                    </div>
 
                 </div>
             </div>
