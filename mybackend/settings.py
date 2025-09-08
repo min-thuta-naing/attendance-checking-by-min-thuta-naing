@@ -26,6 +26,7 @@ SECRET_KEY = "django-insecure-$#0^p!#^kqr*a$51jj&4gsi-5+(sv%x_+oasxt8-6^@6snm%ew
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ALLOWED_HOSTS = [] --> during local development 
 ALLOWED_HOSTS = ["93.127.128.243"]
 
 
@@ -131,7 +132,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-# STATIC_URL = "static/"
+STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
@@ -142,8 +143,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # connecting with react frontend
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://93.127.128.243:5173", # add your VPS IP + frontend port if using vite
+    "http://localhost:5173", # during local developemnt 
+    "http://93.127.128.243:5173", # add your VPS IP + frontend port if using vite (during testing)
+    "http://93.127.128.243:5173", 
 ]
 
 #JWT auth 

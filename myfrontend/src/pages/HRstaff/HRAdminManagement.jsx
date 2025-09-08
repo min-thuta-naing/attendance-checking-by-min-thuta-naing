@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../../components/Sidebar";
 import Loading from "../../components/Loading";
+import BASE_URL from "../../api";
 
 function HRAdminManagement() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -23,7 +24,7 @@ function HRAdminManagement() {
 
     const fetchHRstaff = async (token) => {
         try {
-            const res = await axios.get("http://localhost:8000/api/hr-staff-all/", {
+            const res = await axios.get(`${BASE_URL}/api/hr-staff-all/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -45,7 +46,7 @@ function HRAdminManagement() {
         if (!currentUser?.refresh) return null;
 
         try {
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: currentUser.refresh
             });
             const updatedUser = { ...currentUser, access: res.data.access };

@@ -3,6 +3,7 @@ import axios from "axios";
 import PasswordInputComponent from "../../components/PasswordInputComponent";
 import EmailInputComponent from "../../components/EmailInputComponent";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../api";
 
 function HRLogin() {
     const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ function HRLogin() {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8000/api/login/hr/", {
+            const response = await axios.post(`${BASE_URL}/api/login/hr/`, {
                 email,
                 password,
             });

@@ -5,6 +5,7 @@ import { UserIcon, ArrowRightOnRectangleIcon, ClockIcon, PencilIcon, VideoCamera
 import Loading from "../../components/Loading";
 import { useToast } from "../../contexts/ToastContext";
 import LogoutConfirmation from "../../components/LogoutConfirmation";
+import BASE_URL from "../../api";
 
 function Home() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -73,7 +74,7 @@ function Home() {
         if (!user?.refresh) return null;
 
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+            const res = await fetch(`${BASE_URL}/api/token/refresh/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refresh: user.refresh }),
@@ -150,7 +151,7 @@ function Home() {
             console.log("Attendance payload:", payload);
 
             let token = currentUser.access;
-            let response = await fetch(`http://127.0.0.1:8000/api/attendance/${type}/`, {
+            let response = await fetch(`${BASE_URL}/api/attendance/${type}/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -163,7 +164,7 @@ function Home() {
                 token = await refreshAccessToken();
                 if (!token) throw new Error("Unable to refresh token");
                 const updated = JSON.parse(localStorage.getItem("currentUser"));
-                response = await fetch(`http://127.0.0.1:8000/api/attendance/${type}/`, {
+                response = await fetch(`${BASE_URL}/api/attendance/${type}/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

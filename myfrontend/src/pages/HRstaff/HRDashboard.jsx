@@ -5,6 +5,7 @@ import Sidebar from "../../components/Sidebar";
 import Loading from "../../components/Loading";
 import axios from "axios";
 import { useToast } from "../../contexts/ToastContext";
+import BASE_URL from "../../api";
 
 function HRAttendanceHistory() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -49,7 +50,7 @@ function HRAttendanceHistory() {
         if (!currentUser?.refresh) return null;
 
         try {
-            const res = await axios.post("http://localhost:8000/api/token/refresh/", { refresh: currentUser.refresh });
+            const res = await axios.post(`${BASE_URL}/api/token/refresh/`, { refresh: currentUser.refresh });
             const updatedUser = { ...currentUser, access: res.data.access };
             localStorage.setItem("currentUser", JSON.stringify(updatedUser));
             setCurrentUser(updatedUser);
@@ -67,7 +68,7 @@ function HRAttendanceHistory() {
             const params = {};
             Object.keys(filters).forEach((k) => { if (filters[k]) params[k] = filters[k]; });
 
-            const res = await axios.get("http://localhost:8000/api/hr/attendance/", {
+            const res = await axios.get(`${BASE_URL}/api/hr/attendance/`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
             });
