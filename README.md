@@ -52,5 +52,5 @@ The **Employee Attendance System** is a web-based platform that enables organiza
 ---
 
 ## 4. ER Diagram  
-
+![ER Diagram](assets/AttendanceERD.drawio.png)
 
