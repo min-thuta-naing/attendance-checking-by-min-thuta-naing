@@ -3,12 +3,7 @@
 ## 📑 Contents
 - [1. Overall](#1-overall)
 - [2. Functional Requirements](#2-functional-requirements)
-  - [User Roles](#👨‍💼-user-roles)
-  - [Core Features](#🛠-core-features)
 - [3. Tech Stack](#3-tech-stack)
-  - [Frontend](#🖥️-frontend)
-  - [Backend](#⚙️-backend)
-  - [Deployment & Tools](#📦-deployment--tools)
 - [4. ER Diagram](#4-er-diagram)
 
 ---
