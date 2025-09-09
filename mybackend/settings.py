@@ -27,7 +27,47 @@ SECRET_KEY = "django-insecure-$#0^p!#^kqr*a$51jj&4gsi-5+(sv%x_+oasxt8-6^@6snm%ew
 DEBUG = True
 
 # ALLOWED_HOSTS = [] --> during local development 
-ALLOWED_HOSTS = ["93.127.128.243"]
+#ALLOWED_HOSTS = [
+ #   "93.127.128.243", 
+  #  "zcompany-attendance-check.site", 
+ #   "www.zcompany-attendance-check.site"
+#]
+
+#ip adress of cloudflare proxy 
+CLOUDFLARE_IPS = [
+    "173.245.48.0/20",
+    "103.21.244.0/22",
+    "103.22.200.0/22",
+    "103.31.4.0/22",
+    "141.101.64.0/18",
+    "108.162.192.0/18",
+    "190.93.240.0/20",
+    "188.114.96.0/20",
+    "197.234.240.0/22",
+    "198.41.128.0/17",
+    "162.158.0.0/15",
+    "104.16.0.0/13",
+    "104.24.0.0/14",
+    "172.64.0.0/13",
+    "131.0.72.0/22"
+]
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://zcompany-attendance-check.site",
+    "https://www.zcompany-attendance-check.site",
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+
+
+#ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", "127.0.0.1", "93.127.128.243", "zcompany-attendance-check.site", "www.zcompany-attendance-check.site"]
+
+DEBUG=False
 
 
 # Application definition
@@ -145,7 +185,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # during local developemnt 
     "http://93.127.128.243:5173", # add your VPS IP + frontend port if using vite (during testing)
-    "http://93.127.128.243:5173", 
+    "https://zcompany-attendance-check.site",
+    "https://www.zcompany-attendance-check.site", 
 ]
 
 #JWT auth 

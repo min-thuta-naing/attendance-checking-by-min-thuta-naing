@@ -8,4 +8,8 @@ export default defineConfig({
     react(), 
     tailwindcss(),
   ],
+   server: {
+    host: "0.0.0.0",  //to allow http://93.127.128.243:5173  access via VPS IP also
+     port: 5173,
+  },
 })
