@@ -242,7 +242,7 @@ def verify_face_with_similarity(captured_base64, stored_embeddings_list, thresho
         #to generate embedding
         captured_embedding = DeepFace.represent(
             img_path=temp_path,
-            model_name="VGG-Face",
+            model_name="Facenet",
             enforce_detection=True
         )[0]["embedding"]
         captured_embedding = np.array(captured_embedding)

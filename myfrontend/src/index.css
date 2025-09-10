@@ -129,6 +129,11 @@ button:focus-visible {
   background-color: #b3dba2;
 }
 
+.btn-third:focus {
+  outline: 2px solid #b3dba2; 
+  outline-offset: 2px;      
+}
+
 /* fourth button */
 .btn-fourth {
   background-color: #c0dbee;
@@ -138,6 +143,11 @@ button:focus-visible {
 
 .btn-fourth:hover {
   background-color: #a2badb;
+}
+
+.btn-fourth:focus {
+  outline: 2px solid #a2badb; 
+  outline-offset: 2px;      
 }
 
 /* Warning / Delete button */

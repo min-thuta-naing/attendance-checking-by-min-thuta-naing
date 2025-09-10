@@ -81,15 +81,15 @@ function RegisterEmpFacialData() {
         } else {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        width: { ideal: 300 }, 
+                    video: {
+                        width: { ideal: 300 },
                         height: { ideal: 400 },
-                        facingMode: "user" 
+                        facingMode: "user"
                     },
                 });
-                
+
                 streamRef.current = stream;
-                
+
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                     videoRef.current.onloadedmetadata = () => {
@@ -129,7 +129,7 @@ function RegisterEmpFacialData() {
 
         const ctx = canvas.getContext("2d");
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
+
         try {
             const imgData = canvas.toDataURL("image/jpeg");
             const newImages = [...capturedImages];
@@ -149,14 +149,29 @@ function RegisterEmpFacialData() {
 
     // to convert base64 to Blob
     const dataURLtoBlob = (dataurl) => {
+        // if (!dataurl) return null;
+        // const arr = dataurl.split(",");
+        // const mime = arr[0].match(/:(.*?);/)[1];
+        // const bstr = atob(arr[1]);
+        // let n = bstr.length;
+        // const u8arr = new Uint8Array(n);
+        // while (n--) u8arr[n] = bstr.charCodeAt(n);
+        // return new Blob([u8arr], { type: mime });
         if (!dataurl) return null;
-        const arr = dataurl.split(",");
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) u8arr[n] = bstr.charCodeAt(n);
-        return new Blob([u8arr], { type: mime });
+        try {
+            const arr = dataurl.split(",");
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        } catch (error) {
+            console.error("Error converting dataURL to blob:", error);
+            return null;
+        }
     };
 
     const handleSubmit = async () => {
@@ -164,28 +179,42 @@ function RegisterEmpFacialData() {
             showToast("Please log in again", "error");
             return;
         }
-        
+
         if (capturedImages.some(img => !img)) {
             showToast("Please capture all 3 photos before submitting", "error");
             return;
         }
 
         const formData = new FormData();
-        formData.append("employee", id);
-        
+        // formData.append("employee", id);
+        formData.append("employee", parseInt(id));
+
+        // capturedImages.forEach((img, i) => {
+        //     const blob = dataURLtoBlob(img);
+        //     if (blob) {
+        //         formData.append("images", blob, `capture_${i}.jpg`);
+        //     }
+        // });
         capturedImages.forEach((img, i) => {
             const blob = dataURLtoBlob(img);
             if (blob) {
-                formData.append("images", blob, `capture_${i}.jpg`);
+                console.log(`Image ${i} size:`, blob.size); // Debug log
+                if (blob.size > 0) {
+                    formData.append("images", blob, `capture_${i}.jpg`);
+                } else {
+                    console.error(`Image ${i} has zero size`);
+                }
+            } else {
+                console.error(`Failed to create blob for image ${i}`);
             }
         });
 
         const sendRequest = async (token) => {
             try {
                 await axios.post(`${BASE_URL}/api/face-data/register/`, formData, {
-                    headers: { 
-                        Authorization: `Bearer ${token}`, 
-                        "Content-Type": "multipart/form-data" 
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data"
                     },
                 });
                 showToast("Employee photos uploaded successfully!", "success");
@@ -195,8 +224,9 @@ function RegisterEmpFacialData() {
                     const newToken = await refreshAccessToken();
                     if (newToken) await sendRequest(newToken);
                 } else {
-                    console.error(err);
-                    showToast("Failed to upload facial data", "error");
+                    console.error("Full error response:", err.response); // Add this
+                    console.error("Error data:", err.response?.data); // Add this
+                    showToast(`Failed to upload: ${err.response?.data?.message || 'Unknown error'}`, "error");
                 }
             }
         };

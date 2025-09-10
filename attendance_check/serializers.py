@@ -6,6 +6,7 @@ import numpy as np
 from deepface import DeepFace
 from django.core.files.base import ContentFile
 import tempfile
+import os 
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -72,6 +73,7 @@ class FaceDataSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(), write_only=True, required=True
     )
+    # embeddings = serializers.JSONField(read_only=True) 
 
     class Meta:
         model = FaceData
@@ -79,13 +81,15 @@ class FaceDataSerializer(serializers.ModelSerializer):
         read_only_fields = ["embeddings", "last_updated"]
 
     def create(self, validated_data):
+        print("Received validated_data:", validated_data)  
+        print("Received images:", validated_data.get('images')) 
         employee = validated_data.get("employee")
         images = validated_data.pop("images")  
 
         embeddings = []
 
         for image_file in images:
-            # Save uploaded file temporarily
+            # save the uploaded file temporarily
             with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
                 for chunk in image_file.chunks():
                     temp_file.write(chunk)
@@ -95,7 +99,7 @@ class FaceDataSerializer(serializers.ModelSerializer):
             try:
                 emb = DeepFace.represent(
                     img_path=temp_file_path,
-                    model_name="VGG-Face",
+                    model_name="Facenet",
                     enforce_detection=True
                 )[0]["embedding"]
                 embeddings.append(emb)
@@ -103,8 +107,10 @@ class FaceDataSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "images": f"Face could not be detected: {str(e)}"
                 })
+            finally:
+                os.unlink(temp_file_path)
 
-        # Average embeddings
+        # embeddings
         validated_data["embeddings"] = embeddings
 
         return super().create(validated_data)
