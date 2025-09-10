@@ -85,8 +85,17 @@ class Attendance(models.Model):
     emp_longitude = models.FloatField()
     verified = models.BooleanField(default=False)  
 
+    # class Meta:
+    #     unique_together = ("employee", "date", "session")  
+    
     class Meta:
         unique_together = ("employee", "date", "session")  
+        indexes = [
+            models.Index(fields=['employee']),
+            models.Index(fields=['branch']),
+            models.Index(fields=['date']),
+            models.Index(fields=['session']),
+        ]
 
     def __str__(self):
         return f"{self.employee.email} - {self.date} - {self.session}"

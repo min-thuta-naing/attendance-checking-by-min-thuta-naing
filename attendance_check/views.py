@@ -415,7 +415,9 @@ class HRAttendanceListView(generics.ListAPIView):
         if self.request.user.role != "HR":
             return Attendance.objects.none() 
 
-        queryset = Attendance.objects.all().order_by("-date", "-session")
+        # queryset = Attendance.objects.all().order_by("-date", "-session")
+        queryset = Attendance.objects.select_related('employee', 'branch').order_by("-date", "-session")
+ 
 
         email = self.request.query_params.get("email")
         start_date = self.request.query_params.get("start_date")

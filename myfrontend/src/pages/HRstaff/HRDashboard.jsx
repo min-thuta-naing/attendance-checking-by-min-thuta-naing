@@ -10,7 +10,7 @@ import BASE_URL from "../../api";
 function HRAttendanceHistory() {
     const [currentUser, setCurrentUser] = useState(null);
     const [attendance, setAttendance] = useState([]);
-    const [filters, setFilters] = useState({ start_date: "", end_date: "", session: "", branch: "" });
+    const [filters, setFilters] = useState({ start_date: "", end_date: "", session: "", branch: "", email: "" });
     const navigate = useNavigate();
     const { showToast } = useToast();
 
