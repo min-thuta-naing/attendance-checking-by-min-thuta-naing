@@ -17,21 +17,12 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-$#0^p!#^kqr*a$51jj&4gsi-5+(sv%x_+oasxt8-6^@6snm%ew"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False # production 
+# DEBUG = True # local 
 
-# ALLOWED_HOSTS = [] --> during local development 
-#ALLOWED_HOSTS = [
- #   "93.127.128.243", 
-  #  "zcompany-attendance-check.site", 
- #   "www.zcompany-attendance-check.site"
-#]
 
 #ip adress of cloudflare proxy 
 CLOUDFLARE_IPS = [
@@ -52,22 +43,25 @@ CLOUDFLARE_IPS = [
     "131.0.72.0/22"
 ]
 
-
+# Production 
 CSRF_TRUSTED_ORIGINS = [
     "https://zcompany-attendance-check.site",
     "https://www.zcompany-attendance-check.site",
 ]
+
+# local 
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
+# ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
 
+ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost", "93.127.128.243", "zcompany-attendance-check.site", "www.zcompany-attendance-check.site"]
 
-#ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = ["*", "127.0.0.1", "93.127.128.243", "zcompany-attendance-check.site", "www.zcompany-attendance-check.site"]
-
-DEBUG=False
 
 
 # Application definition
@@ -119,17 +113,29 @@ WSGI_APPLICATION = "mybackend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# postgresql set up 
+# postgresql set up (for production)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'attendance_db',      # your DB name
-        'USER': 'thutaminn', # your DB user
-        'PASSWORD': '6531503157',  # your DB password
-        'HOST': 'localhost',          # for development or Render DB host later
+        'NAME': 'attendance_db',     
+        'USER': 'thutaminn',
+        'PASSWORD': '6531503157',  
+        'HOST': 'localhost',         
         'PORT': '5432',
     }
 }
+
+#for local development 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'attendance_db',     
+#         'USER': 'minthutanaing',
+#         'PASSWORD': '6531503157',  
+#         'HOST': 'localhost',         
+#         'PORT': '5432',
+#     }
+# }
 
 AUTH_USER_MODEL = 'attendance_check.User'
 
@@ -181,19 +187,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# connecting with react frontend
+# CORS for production (connecting with react frontend)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", # during local developemnt 
-    "http://93.127.128.243:5173", # add your VPS IP + frontend port if using vite (during testing)
+    "http://localhost:5173", 
+    "http://93.127.128.243:5173", 
     "https://zcompany-attendance-check.site",
     "https://www.zcompany-attendance-check.site", 
 ]
+
+# CORS for local developemnt
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
+# ]
 
 #JWT auth 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    # "PAGE_SIZE": 50, 
 }
 
 #media folder to store employee photo
