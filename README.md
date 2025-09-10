@@ -49,12 +49,14 @@ The **Employee Attendance System** is a web-based platform that enables organiza
 ### ⚙️ Backend  
 - **Django (Django REST Framework)**  
 - **JWT Authentication**  
-- **DeepFace (VGG-Face)**  
+- **DeepFace (Facenet)**  
 - **Geopy**  
 - **PostgreSQL**  
   
 ### 📦 Deployment & Tools  
-- **Hetzner**  
+- **Database Mart**  
+- **Gunicorn and Nginx**
+- **Cloudflare (DNS) & domain name from GoDaddy.com**
 - **GitHub**  
 
 ---
